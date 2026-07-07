@@ -47299,7 +47299,32 @@ Object.keys(DATA.lotDomIds).forEach(key=>{
 const input = document.getElementById('searchInput');
 document.querySelector('.search-box svg').addEventListener('click', ()=> input.focus());
 const sugBox = document.getElementById('suggestions');
-const searchIndex = Object.keys(DATA.lotes).map(id=>({id, owner:String(DATA.lotes[id].owner||'')}));
+let searchIndex = Object.keys(DATA.lotes).map(id=>({id, owner:String(DATA.lotes[id].owner||'')}));
+
+// trae los apellidos en vivo desde la planilla (Maestro Lotes), asi no dependemos
+// mas de los datos horneados en el HTML. Si falla por cualquier motivo, se queda
+// con los datos horneados como respaldo, sin romper nada.
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwAF78v-WRJfzWanOMYpGSWQafRJfIaSLufS0HWXYrpn5prALUCiGNYHMpyzm-GS24t/exec';
+function cargarSociosEnVivo(){
+  const cbName = 'onSociosLoaded_'+Date.now();
+  window[cbName] = function(payload){
+    try{
+      const socios = payload && payload.socios ? payload.socios : {};
+      Object.keys(socios).forEach(alias=>{
+        if(DATA.lotes[alias]) DATA.lotes[alias].owner = socios[alias];
+      });
+      searchIndex = Object.keys(DATA.lotes).map(id=>({id, owner:String(DATA.lotes[id].owner||'')}));
+    } catch(err){ /* si algo falla, se queda con los datos horneados */ }
+    delete window[cbName];
+    script.remove();
+  };
+  const script = document.createElement('script');
+  script.src = SHEET_API_URL + '?callback=' + cbName;
+  script.onerror = ()=>{ delete window[cbName]; };
+  document.body.appendChild(script);
+}
+cargarSociosEnVivo();
+
 input.addEventListener('input', ()=>{
   const q = input.value.trim().toLowerCase();
   if(!q){ sugBox.classList.remove('open'); sugBox.innerHTML=''; btnDestinos.style.visibility=''; return; }
