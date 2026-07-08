@@ -154,10 +154,10 @@
   .contacto-footer{ font-size:11px; color:var(--gris); font-style:italic; margin:0; }
   .socio-form{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
   .socio-row{ display:flex; gap:8px; }
-  .socio-row .socio-input:first-child{ flex:0 0 34%; text-transform:uppercase; }
-  .socio-row .socio-input:last-child{ flex:1; }
+  .socio-row .socio-input:first-child{ flex:0 0 26%; text-transform:uppercase; }
+  .socio-row .socio-input:last-child{ flex:1; min-width:0; }
   .socio-input.invalid{ border-color:#c0392b; background:rgba(192,57,43,.08); }
-  .socio-input{ border:1px solid rgba(19,84,87,.2); border-radius:10px; padding:10px 12px; font-size:14px; font-family:Roboto,Arial,sans-serif; color:var(--petroleo); background:rgba(255,255,255,.6); }
+  .socio-input{ box-sizing:border-box; border:1px solid rgba(19,84,87,.2); border-radius:10px; padding:10px 12px; font-size:14px; font-family:Roboto,Arial,sans-serif; color:var(--petroleo); background:rgba(255,255,255,.6); }
   .socio-input::placeholder{ color:var(--gris); }
   .socio-textarea{ min-height:90px; resize:vertical; font-family:Roboto,Arial,sans-serif; }
   .panel-group-btn-lima{ background:var(--lima); color:var(--petroleo); border:none; border-radius:14px; padding:12px 18px; width:100%; font-size:14px; font-weight:700; box-shadow:0 3px 8px rgba(19,84,87,.25); margin-bottom:10px; }
@@ -45411,17 +45411,17 @@ AAAAAAAAAAAAAAAAAAAAAAAck/8DV6qYiGrDwhwAAAAASUVORK5CYII=" transform="matrix(1.29
   <div class="panel-card">
     <div class="panel-top">
       <div>
-        <h2>¿Sos socio?</h2>
-        <p class="contacto-subtitle">Pedile algo al administrador</p>
+        <h2>Gestión de datos</h2>
+        <p class="contacto-subtitle">Disponible exclusivamente para socios activos.</p>
       </div>
       <button class="panel-x" id="btnSocioX">✕</button>
     </div>
 
-    <p class="contacto-intro">El nombre que se muestra en cada lote corresponde exclusivamente al socio titular registrado en la base de datos del Club. No es posible agregar nombres adicionales.<br><br>Escribí tu consulta, pedido o sugerencia y presioná "Enviar por WhatsApp". Se preparará un mensaje con los datos del lote y del titular para que podamos ayudarte.</p>
+    <p class="contacto-intro">El nombre de cada lote corresponde únicamente al socio titular registrado por el Club.<br><br>Si necesitás corregir o actualizar la información publicada en el mapa, completá el formulario.</p>
 
     <div class="socio-form">
       <div class="socio-row">
-        <input type="text" id="socioLote" class="socio-input" placeholder="Lote (ej. M09)" maxlength="3" required>
+        <input type="text" id="socioLote" class="socio-input" placeholder="M03" maxlength="3" required>
         <input type="text" id="socioNombre" class="socio-input" placeholder="Nombre y apellido" required>
       </div>
       <textarea id="socioMensaje" class="socio-input socio-textarea" placeholder="Escribí tu mensaje acá..."></textarea>
