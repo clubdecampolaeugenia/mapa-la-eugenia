@@ -18,11 +18,11 @@
     --verdecl:#b7d6b5; --hueso:#f5f3ec; --gris:#48797c;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;background:#0e3436;font-family:'Roboto',Arial,sans-serif;color:var(--petroleo);
+  html,body{margin:0;padding:0;background:#115255;font-family:'Roboto',Arial,sans-serif;color:var(--petroleo);
     overscroll-behavior:none; height:100%; overflow:hidden; touch-action:none; position:fixed; width:100%;}
 
   /* ---- mapa a pantalla completa ---- */
-  #mapViewport{position:fixed; inset:0; overflow:hidden; background:#0e3436; touch-action:none;}
+  #mapViewport{position:fixed; inset:0; overflow:hidden; background:#115255; touch-action:none;}
   #mapViewport, #mapViewport *{ touch-action:none; }
   #mapInner{position:absolute; top:0; left:0; transform-origin:0 0; will-change:transform;}
   #mapContent{position:absolute; width:1600px; height:899px;}
@@ -126,8 +126,8 @@
   }
   .panel-overlay.show .panel-card{ transform:translateY(0); }
   .panel-card h2{ font-family:'Anton',Impact,'Arial Narrow',sans-serif; font-weight:400; text-transform:uppercase; letter-spacing:.03em; font-size:20px; margin:0; }
-  .contacto-subtitle{ font-family:Roboto,Arial,sans-serif; font-size:14px; font-weight:700; color:var(--petroleo); margin:2px 0 14px; }
-  .panel-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .contacto-subtitle{ font-family:Roboto,Arial,sans-serif; font-size:14px; font-weight:700; color:var(--petroleo); margin:2px 0 0; }
+  .panel-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
   .panel-x{ background:rgba(19,84,87,.1); border:none; border-radius:50%; width:30px; height:30px; color:var(--petroleo); font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; padding:0; flex-shrink:0; }
   .panel-group{ margin-bottom:16px; }
   .panel-group h3{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--gris); margin:0 0 8px; }
@@ -145,7 +145,7 @@
   .eugenia-block p{ font-size:13px; color:var(--gris); margin:0 0 10px; }
   .btn-eugenia{ background:var(--lima); color:var(--petroleo); border:none; border-radius:14px; padding:12px 18px; width:100%; font-size:14px; font-weight:700; box-shadow:0 3px 8px rgba(19,84,87,.25); }
   .contacto-intro{ font-size:14px; line-height:1.5; margin:0 0 8px; }
-  .contacto-caution{ font-size:12px; color:var(--gris); font-style:italic; margin:0 0 12px; }
+  .contacto-caution{ font-size:12px; color:var(--gris); font-style:italic; margin:0 0 12px; text-align:center; }
   .contacto-signs{ display:flex; justify-content:center; gap:10px; margin:0 0 18px; flex-wrap:wrap; }
   .contacto-signs img{ width:38px; height:38px; object-fit:contain; }
   .contacto-item{ background:var(--verdecl); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:2px; margin-bottom:16px; }
