@@ -45838,7 +45838,7 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
   // uso sendBeacon en vez de fetch: fetch se corta si la pagina navega antes de
   // terminar de mandarse, sendBeacon esta hecho justo para este caso
   try{
-    const beaconData = new Blob([JSON.stringify({lote, nombre, mensaje: texto})], {type:'text/plain;charset=UTF-8'});
+    const beaconData = new Blob([JSON.stringify({origen:'Cómo Llegar', lote, nombre, mensaje: texto})], {type:'text/plain;charset=UTF-8'});
     navigator.sendBeacon(SHEET_API_URL, beaconData);
   } catch(err){ /* si falla el guardado, igual sigue el WhatsApp */ }
 
