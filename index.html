@@ -45668,6 +45668,14 @@ function zoomAround(rel, newScale){
   clampView(); applyTransform();
 }
 let lastTap=0;
+function screenToContent(clientX, clientY){
+  const rect = mapViewport.getBoundingClientRect();
+  const localX = clientX - rect.left, localY = clientY - rect.top;
+  // deshacer pan/zoom y el margen de aire (PAD_X/PAD_Y) para volver a unidades reales del viewBox
+  const contentX = (localX - view.x) / view.scale - PAD_X;
+  const contentY = (localY - view.y) / view.scale - PAD_Y;
+  return { x: contentX / SCALE, y: contentY / SCALE };
+}
 mapViewport.addEventListener('pointerup', e=>{
   if(pointers.size>0) return;
 
@@ -45680,7 +45688,8 @@ mapViewport.addEventListener('pointerup', e=>{
       const el = document.elementFromPoint(e.clientX, e.clientY);
       const lotEl = el ? el.closest('[data-lotkey]') : null;
       if(lotEl){
-        selectDestino(lotEl.dataset.lotkey);
+        const tapPoint = screenToContent(e.clientX, e.clientY);
+        selectDestino(lotEl.dataset.lotkey, tapPoint);
         downWasSingle=false; downPos=null;
         return;
       }
@@ -45860,7 +45869,15 @@ document.querySelectorAll('.panel-group button[data-acceso]').forEach(btn=>{
   });
 });
 
-function selectDestino(key){
+function selectDestino(key, tapPoint){
+  // Club y Playon comparten el mismo poligono clickeable (F00): si el toque
+  // fue directo sobre el mapa (no desde el menu Destinos), decido cual de los
+  // dos segun a que icono real esta mas cerca, en vez de asumir siempre Club
+  if(key === 'F00' && tapPoint && DATA.accesoCoords['Z4'] && DATA.accesoCoords['Z5']){
+    const dClub = Math.hypot(tapPoint.x - DATA.accesoCoords['Z4'][0], tapPoint.y - DATA.accesoCoords['Z4'][1]);
+    const dPlayon = Math.hypot(tapPoint.x - DATA.accesoCoords['Z5'][0], tapPoint.y - DATA.accesoCoords['Z5'][1]);
+    key = dPlayon < dClub ? 'Z5' : 'Z4';
+  }
   currentKey = key;
   destinosMenu.classList.remove('open');
   btnDestinos.classList.remove('open');
@@ -45955,7 +45972,7 @@ Object.keys(DATA.lotDomIds).forEach(key=>{
   const el = domElFor(key);
   if(el){
     el.dataset.lotkey = key;
-    el.addEventListener('click', ()=> selectDestino(key));
+    el.addEventListener('click', (e)=> selectDestino(key, screenToContent(e.clientX, e.clientY)));
   }
 });
 
