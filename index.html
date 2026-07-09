@@ -46021,14 +46021,29 @@ input.addEventListener('input', ()=>{
 });
 
 function shareInvite(){
-  const label = currentKey ? labelFor(currentKey) : 'La Eugenia';
   const url = new URL(location.href);
   url.search = '';
   if(currentKey) url.searchParams.set('destino', currentKey);
-  const gmapsUrl = 'https://www.google.com/maps/search/?api=1&query='+ENTRADA_LATLNG;
-  const text = 'Te comparto cómo llegar a '+label+' en La Eugenia.' +
-    '\n\n📍 Cómo llegar al barrio (Google Maps): '+gmapsUrl +
-    '\n\n🗺️ Una vez en la entrada, abrí este link para ir directo a destino: '+url.toString();
+
+  const esLugarEspecial = currentKey && ['Z3','Z4','Z5','F00','U00'].includes(currentKey);
+  let lineaDestino;
+  if(esLugarEspecial){
+    lineaDestino = '📍 Destino: '+labelFor(currentKey)+'.';
+  } else if(currentKey){
+    const l = DATA.lotes[currentKey];
+    lineaDestino = '📍 Destino: Lote '+currentKey+
+      (l && l.owner ? '\nSocio titular registrado: '+l.owner+'.' : '.');
+  } else {
+    lineaDestino = '📍 Destino: La Eugenia.';
+  }
+
+  const text = 'Te comparto la información para que puedas llegar a este destino en el Club de Campo La Eugenia.' +
+    '\n\n'+lineaDestino +
+    '\n\n🗺️ Abrí este mapa interactivo para llegar al destino. Si todavía no conocés cómo llegar a La Eugenia, el mapa también incluye un acceso directo a Google Maps para llevarte hasta la Garita de Seguridad.' +
+    '\n'+url.toString() +
+    '\n\n👮 Al llegar a la Garita de Seguridad, es posible que te consulten a qué lote te dirigís.' +
+    '\n\nConservá este enlace. También te ayudará a orientarte durante tu recorrido y a encontrar el camino de vuelta.';
+
   if(navigator.share){
     navigator.share({title:'Cómo llegar - La Eugenia', text}).catch(()=>{ copyFallback(text); });
   } else {
