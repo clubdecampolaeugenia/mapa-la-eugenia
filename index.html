@@ -45834,13 +45834,12 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
   const base = etiqueta + '\n\n' + datos + '\n\n' + (texto || '(sin mensaje adicional)');
   const msg = encodeURIComponent(base);
 
-  // guardo el pedido en la Sheet (SOLICITUDES) ademas de mandarlo por WhatsApp.
-  // no-cors: no puedo leer la respuesta, pero el guardado sucede igual del lado del script
+  // guardo el pedido en la Sheet (SOLICITUDES) justo antes de navegar a WhatsApp.
+  // uso sendBeacon en vez de fetch: fetch se corta si la pagina navega antes de
+  // terminar de mandarse, sendBeacon esta hecho justo para este caso
   try{
-    fetch(SHEET_API_URL, {
-      method:'POST', mode:'no-cors',
-      body: JSON.stringify({lote, nombre, mensaje: texto})
-    });
+    const beaconData = new Blob([JSON.stringify({lote, nombre, mensaje: texto})], {type:'text/plain;charset=UTF-8'});
+    navigator.sendBeacon(SHEET_API_URL, beaconData);
   } catch(err){ /* si falla el guardado, igual sigue el WhatsApp */ }
 
   panelSocio.classList.remove('show');
