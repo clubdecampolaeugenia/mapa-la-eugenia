@@ -45833,6 +45833,16 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
   const datos = 'Lote: '+lote+'\nNombre y apellido: '+nombre;
   const base = etiqueta + '\n\n' + datos + '\n\n' + (texto || '(sin mensaje adicional)');
   const msg = encodeURIComponent(base);
+
+  // guardo el pedido en la Sheet (SOLICITUDES) ademas de mandarlo por WhatsApp.
+  // no-cors: no puedo leer la respuesta, pero el guardado sucede igual del lado del script
+  try{
+    fetch(SHEET_API_URL, {
+      method:'POST', mode:'no-cors',
+      body: JSON.stringify({lote, nombre, mensaje: texto})
+    });
+  } catch(err){ /* si falla el guardado, igual sigue el WhatsApp */ }
+
   panelSocio.classList.remove('show');
   window.location.href = 'https://wa.me/5493764113300?text='+msg;
 });
