@@ -34,6 +34,13 @@
   #realSvg #LOTES .lot-selected{
     fill:var(--lima) !important; stroke:#135457 !important; stroke-width:0.6 !important; fill-opacity:0.85 !important;
   }
+  /* F00 (Club) tiene graficos decorativos dibujados encima, asi que un relleno
+     no se nota bien - resalto con un contorno fuerte que se ve por los bordes */
+  #realSvg [id="F00"].lot-selected{
+    fill:var(--lima) !important; fill-opacity:0.35 !important;
+    stroke:var(--lima) !important; stroke-width:2.2 !important;
+    filter:drop-shadow(0 0 3px rgba(196,223,87,.9));
+  }
   #realSvg #CALLES{ display:none; }
   #realSvg #MANZANAS{ display:inline !important; }
   .route-line{fill:none; stroke:var(--lima); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:4.5 3.2; filter:drop-shadow(0 0 2px rgba(0,0,0,.6)); animation:flow 1s linear infinite;}
@@ -45891,12 +45898,7 @@ function selectDestino(key, tapPoint){
   btnDestinos.classList.remove('open');
   svgRoot.querySelectorAll('.lot-selected').forEach(p=>p.classList.remove('lot-selected'));
   const el = domElFor(key);
-  if(el){
-    el.classList.add('lot-selected');
-    // F00 tiene graficos decorativos (canchas) dibujados encima en el SVG original;
-    // lo traigo al frente para que el resaltado se vea, sin tocar el resto del orden
-    if(el.id === 'F00') svgRoot.appendChild(el);
-  }
+  if(el) el.classList.add('lot-selected');
 
   const signIndicator = document.getElementById('signIndicator');
   signIndicator.classList.remove('flash');
@@ -45997,6 +45999,7 @@ Object.entries(DATA.hotspots).forEach(([domId, targetKey])=>{
   if(el){
     el.dataset.lotkey = targetKey;
     el.addEventListener('click', (e)=> selectDestino(targetKey, screenToContent(e.clientX, e.clientY)));
+    svgRoot.appendChild(el); // al frente desde el inicio, no solo tras una seleccion
   }
 });
 
