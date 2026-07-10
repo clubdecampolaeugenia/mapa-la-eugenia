@@ -96,7 +96,7 @@
   .suggestion-item span{font-size:11px; color:var(--gris); text-align:right;}
 
   /* menu de destinos expandible */
-  .destinos-float{ top:calc(72px + env(safe-area-inset-top)); left:14px; }
+  .destinos-float{ top:calc(76px + env(safe-area-inset-top)); left:14px; }
   .pin-btn{
     width:50px; height:50px; border-radius:50%; border:1px solid rgba(255,255,255,.5);
     background:rgba(255,255,255,.4);
@@ -36576,7 +36576,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 	l0.3,2.2H1147.4z"/></svg></span></button>
 
   <div class="destinos-menu" id="destinosMenu">
-    <div class="menu-title" id="menuTitleClose">Menu</div>
+    <div class="menu-title" id="menuTitleClose"></div>
     <button id="btnContacto" class="btn-cgv">Bienvenidos</button>
     <button data-acceso="Z4">Ir al Club</button>
     <button data-acceso="Z5">Ir al Playón</button>
@@ -36917,6 +36917,25 @@ function zoomAround(rel, newScale){
   view.scale = newScale; view.x = rel.x-imgX*newScale; view.y = rel.y-imgY*newScale;
   clampView(); applyTransform();
 }
+function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+function animateZoomAround(rel, newScale, duration){
+  duration = duration || 320;
+  newScale = Math.min(view.maxScale, Math.max(view.minScale, newScale));
+  const startScale = view.scale, startX = view.x, startY = view.y;
+  const imgX = (rel.x-view.x)/startScale, imgY = (rel.y-view.y)/startScale;
+  const endX = rel.x-imgX*newScale, endY = rel.y-imgY*newScale;
+  const t0 = performance.now();
+  function step(now){
+    const p = Math.min(1, (now-t0)/duration);
+    const e = easeOutCubic(p);
+    view.scale = startScale + (newScale-startScale)*e;
+    view.x = startX + (endX-startX)*e;
+    view.y = startY + (endY-startY)*e;
+    clampView(); applyTransform();
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 let lastTap=0;
 function screenToContent(clientX, clientY){
   const rect = mapViewport.getBoundingClientRect();
@@ -36951,7 +36970,7 @@ mapViewport.addEventListener('pointerup', e=>{
   if(now-lastTap<300){
     const rect=mapViewport.getBoundingClientRect();
     const p={x:e.clientX-rect.left,y:e.clientY-rect.top};
-    zoomAround(p, view.scale<view.baseScale*1.8 ? view.baseScale*2.8 : view.baseScale);
+    animateZoomAround(p, view.scale<view.baseScale*1.8 ? view.baseScale*2.8 : view.baseScale);
   }
   lastTap=now;
 });
@@ -37226,7 +37245,7 @@ extlinkOverlay.addEventListener('click', (e)=>{
 const ENTRADA_LATLNG = '-27.4973862,-55.8634843';
 document.getElementById('btnMaps').addEventListener('click', ()=>{
   destinosMenu.classList.remove('open'); btnDestinos.classList.remove('open');
-  confirmExternalLink('Cómo llegar', 'Vas a abrir tu app de mapas para llegar al barrio.', ()=>{
+  confirmExternalLink('Rumbo a La Eugenia', 'Vas a abrir tu app de mapas para llegar al barrio.', ()=>{
     window.location.href = 'https://www.google.com/maps/search/?api=1&query='+ENTRADA_LATLNG;
   });
 });
