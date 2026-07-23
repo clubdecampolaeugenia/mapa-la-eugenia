@@ -36695,6 +36695,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
         <select id="socioTipo" class="socio-input">
           <option value="consulta">Consulta general</option>
           <option value="ocultar">Ocultar mi nombre del mapa</option>
+          <option value="mostrar">Mostrar mi nombre en el mapa</option>
         </select>
       </div>
       <div class="socio-row">
@@ -37156,9 +37157,9 @@ const socioTipoSelect = document.getElementById('socioTipo');
 const socioOcultarExtra = document.getElementById('socioOcultarExtra');
 const btnSocioEnviarEl = document.getElementById('btnSocioEnviar');
 socioTipoSelect.addEventListener('change', ()=>{
-  const esOcultar = socioTipoSelect.value === 'ocultar';
-  socioOcultarExtra.style.display = esOcultar ? 'flex' : 'none';
-  btnSocioEnviarEl.textContent = esOcultar ? 'Enviar pedido' : 'Enviar por WhatsApp';
+  const esGestionLote = socioTipoSelect.value === 'ocultar' || socioTipoSelect.value === 'mostrar';
+  socioOcultarExtra.style.display = esGestionLote ? 'flex' : 'none';
+  btnSocioEnviarEl.textContent = esGestionLote ? 'Enviar pedido' : 'Enviar por WhatsApp';
 });
 
 function jsonpGet_(url, params, cb){
@@ -37186,9 +37187,9 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
     return;
   }
 
-  // --- Pedido de "Ocultar mi nombre del mapa": va directo al circuito de Solicitudes,
+  // --- Pedido de "Ocultar"/"Mostrar mi nombre del mapa": va directo al circuito de Solicitudes,
   // no pasa por WhatsApp — queda en la bandeja para que lo revise el administrador.
-  if(tipo === 'ocultar'){
+  if(tipo === 'ocultar' || tipo === 'mostrar'){
     const contacto = document.getElementById('socioContacto').value.trim();
     const vinculacion = document.getElementById('socioVinculacion').value;
     const contactoInput = document.getElementById('socioContacto');
@@ -37200,9 +37201,10 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
       showToast('Completá tu email y en qué carácter pedís la gestión');
       return;
     }
+    const origenPedido = tipo === 'ocultar' ? 'Ocultar lote' : 'Mostrar lote';
     btnSocioEnviarEl.disabled = true;
     jsonpGet_(EXEC_URL_SOLICITUDES, {
-      action: 'crearSolicitud', origen: 'Ocultar lote', lote, solicitanteNombre: nombre,
+      action: 'crearSolicitud', origen: origenPedido, lote, solicitanteNombre: nombre,
       solicitanteContacto: contacto, solicitanteVinculacion: vinculacion, mensaje: texto || ''
     }, function(res){
       btnSocioEnviarEl.disabled = false;
