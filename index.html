@@ -37201,7 +37201,7 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
       showToast('Completá tu email y en qué carácter pedís la gestión');
       return;
     }
-    const origenPedido = tipo === 'ocultar' ? 'Ocultar lote' : 'Mostrar lote';
+    const origenPedido = tipo === 'ocultar' ? 'Ocultar nombre' : 'Mostrar nombre';
     btnSocioEnviarEl.disabled = true;
     jsonpGet_(EXEC_URL_SOLICITUDES, {
       action: 'crearSolicitud', origen: origenPedido, lote, solicitanteNombre: nombre,
