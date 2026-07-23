@@ -36692,8 +36692,25 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 
     <div class="socio-form">
       <div class="socio-row">
+        <select id="socioTipo" class="socio-input">
+          <option value="consulta">Consulta general</option>
+          <option value="ocultar">Ocultar mi nombre del mapa</option>
+        </select>
+      </div>
+      <div class="socio-row">
         <input type="text" id="socioLote" class="socio-input" placeholder="M03" maxlength="3" required>
         <input type="text" id="socioNombre" class="socio-input" placeholder="Nombre y apellido" required>
+      </div>
+      <div class="socio-row" id="socioOcultarExtra" style="display:none;">
+        <input type="email" id="socioContacto" class="socio-input" placeholder="Tu email (para avisarte)">
+        <select id="socioVinculacion" class="socio-input">
+          <option value="">¿En qué carácter pedís esto?</option>
+          <option value="Socio titular">Soy el socio titular</option>
+          <option value="Grupo familiar directo">Grupo familiar directo</option>
+          <option value="Autorizado">Autorizado</option>
+          <option value="Inquilino">Inquilino</option>
+          <option value="Otro">Otro</option>
+        </select>
       </div>
       <textarea id="socioMensaje" class="socio-input socio-textarea" placeholder="Escribí tu mensaje acá..."></textarea>
     </div>
@@ -37132,10 +37149,33 @@ socioLoteInput.addEventListener('input', ()=>{
   const numeros = v.replace(/[A-Z]/g,'').slice(0,2);
   socioLoteInput.value = letra + numeros;
 });
+
+const EXEC_URL_SOLICITUDES = 'https://script.google.com/macros/s/AKfycbzNVpVv8UHCBhd44q0e6k-HtLPHhOXxnmWw3nOaOerXnmyazWlnO_WDrS_dLWqOVi13/exec';
+
+const socioTipoSelect = document.getElementById('socioTipo');
+const socioOcultarExtra = document.getElementById('socioOcultarExtra');
+const btnSocioEnviarEl = document.getElementById('btnSocioEnviar');
+socioTipoSelect.addEventListener('change', ()=>{
+  const esOcultar = socioTipoSelect.value === 'ocultar';
+  socioOcultarExtra.style.display = esOcultar ? 'flex' : 'none';
+  btnSocioEnviarEl.textContent = esOcultar ? 'Enviar pedido' : 'Enviar por WhatsApp';
+});
+
+function jsonpGet_(url, params, cb){
+  const cbName = 'onJsonp_'+Date.now()+'_'+Math.floor(Math.random()*10000);
+  window[cbName] = function(payload){ cb(payload); delete window[cbName]; script.remove(); };
+  const qs = Object.keys(params).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(params[k])).join('&');
+  const script = document.createElement('script');
+  script.src = url + '?' + qs + '&callback=' + cbName;
+  script.onerror = ()=>{ delete window[cbName]; };
+  document.body.appendChild(script);
+}
+
 document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
   const lote = socioLoteInput.value.trim();
   const nombre = document.getElementById('socioNombre').value.trim();
   const texto = document.getElementById('socioMensaje').value.trim();
+  const tipo = socioTipoSelect.value;
 
   const loteValido = /^[A-Z][0-9]{2}$/.test(lote);
   socioLoteInput.classList.toggle('invalid', !loteValido);
@@ -37146,6 +37186,39 @@ document.getElementById('btnSocioEnviar').addEventListener('click', ()=>{
     return;
   }
 
+  // --- Pedido de "Ocultar mi nombre del mapa": va directo al circuito de Solicitudes,
+  // no pasa por WhatsApp — queda en la bandeja para que lo revise el administrador.
+  if(tipo === 'ocultar'){
+    const contacto = document.getElementById('socioContacto').value.trim();
+    const vinculacion = document.getElementById('socioVinculacion').value;
+    const contactoInput = document.getElementById('socioContacto');
+    const vinculacionInput = document.getElementById('socioVinculacion');
+    const contactoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto);
+    contactoInput.classList.toggle('invalid', !contactoValido);
+    vinculacionInput.classList.toggle('invalid', !vinculacion);
+    if(!contactoValido || !vinculacion){
+      showToast('Completá tu email y en qué carácter pedís la gestión');
+      return;
+    }
+    btnSocioEnviarEl.disabled = true;
+    jsonpGet_(EXEC_URL_SOLICITUDES, {
+      action: 'crearSolicitud', origen: 'Ocultar lote', lote, solicitanteNombre: nombre,
+      solicitanteContacto: contacto, solicitanteVinculacion: vinculacion, mensaje: texto || ''
+    }, function(res){
+      btnSocioEnviarEl.disabled = false;
+      if(res && res.ok){
+        showToast('Pedido enviado. Te avisamos por mail cuando se resuelva.');
+        panelSocio.classList.remove('show');
+        socioLoteInput.value = ''; nombreInput.value = ''; contactoInput.value = '';
+        vinculacionInput.value = ''; document.getElementById('socioMensaje').value = '';
+      } else {
+        showToast('No se pudo enviar el pedido. Probá de nuevo en un momento.');
+      }
+    });
+    return;
+  }
+
+  // --- Consulta general: comportamiento original, sin cambios ---
   const etiqueta = 'Este comentario proviene desde la app "Cómo Llegar" y va dirigido al administrador.';
   const datos = 'Lote: '+lote+'\nNombre y apellido: '+nombre;
   const base = etiqueta + '\n\n' + datos + '\n\n' + (texto || '(sin mensaje adicional)');
